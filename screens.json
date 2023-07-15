@@ -1,0 +1,6 @@
+{
+    "from libs.uix.baseclass.homescreen import HomeScreen":{
+        "screen_name": "Home",
+        "factory": "Factory.HomeScreen()"
+    }
+}

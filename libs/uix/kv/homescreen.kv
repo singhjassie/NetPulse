@@ -1,0 +1,37 @@
+<HomeScreen>:
+    MDBoxLayout:
+        orientation:'vertical'
+        md_bg_color: app.theme_cls.bg_darkest
+        Image:
+            source: 'assets/images/NetPulse-black-text.png' if app.theme_cls.theme_style == 'Light' else 'assets/images/NetPulse-white-text.png'
+            size_hint: None , None
+            size: 150, 150
+            # pos: 100, root.height - 150`
+
+        ScrollView:
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: '50dp'
+                spacing: '50dp'
+                adaptive_size: True
+                pos_hint: {"center_x": .5, "center_y": .5}
+                IfaceCard:
+                    icon: 'file-upload'
+                IfaceCard:
+                IfaceCard:
+                IfaceCard:
+
+
+<IfaceCard@MDCard>:
+    size_hint: None, None
+    size: 250, 350
+    focus_behavior: True
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_light
+    style: 'outlined'
+    line_color: app.theme_cls.primary_color
+    line_width: 1
+    ripple_behavior: True
+    ripple_color: app.theme_cls.primary_light
+    radius: [15]
+    # elevation: 2

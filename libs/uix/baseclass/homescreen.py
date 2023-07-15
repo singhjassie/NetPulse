@@ -1,14 +1,8 @@
 from kivymd.uix.screen import MDScreen
 from kivy.lang.builder import Builder
 
-kv = """
-<HomeScreen>:
-    MDLabel:
-        text: 'Hurray! i have made the home screen'
-        halign: 'center'
-"""
-
-Builder.load_string(kv)
+Builder.load_file('libs/uix/kv/homescreen.kv')
 
 class HomeScreen(MDScreen):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(HomeScreen, self).__init__(*args, **kwargs)

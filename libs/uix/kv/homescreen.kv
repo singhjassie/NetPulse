@@ -1,25 +1,113 @@
-<HomeScreen>:
-    MDBoxLayout:
-        orientation:'vertical'
-        md_bg_color: app.theme_cls.bg_darkest
-        Image:
-            source: 'assets/images/NetPulse-black-text.png' if app.theme_cls.theme_style == 'Light' else 'assets/images/NetPulse-white-text.png'
-            size_hint: None , None
-            size: 150, 150
-            # pos: 100, root.height - 150`
+<HomeScreen>
 
-        ScrollView:
-            MDBoxLayout:
-                orientation: 'horizontal'
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 150
+            padding: (50, 0, 50, 0)
+
+            Image:
+                source: 'assets/images/NetPulse-black-text.png' if app.theme_cls.theme_style == 'Light' else 'assets/images/NetPulse-white-text.png'
+                size_hint_x: None
+                width: 150
+
+            Widget: # Spacer
+
+            MDIconButton:
+                icon: 'brightness-6'
+                on_release: app.switch_theme()
+
+            MDIconButton:
+                icon: 'cog-outline'
+                on_release: app.root.open_settings()
+
+        MDScrollView:
+            StackLayout:
+                size_hint_y: None
+                height: self.minimum_height
                 padding: '50dp'
                 spacing: '50dp'
-                adaptive_size: True
-                pos_hint: {"center_x": .5, "center_y": .5}
+
                 IfaceCard:
-                    icon: 'file-upload'
+                    MDBoxLayout:
+                        padding: 20
+                        orientation: 'vertical'
+                        MDIconButton:
+                            icon: 'file-document-outline'
+                            icon_size: 64
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                        MDFillRoundFlatIconButton:
+                            icon: 'upload'
+                            text: 'Upload Pcap File'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.open_file_manager()
+
+                        MDLabel:
+                            text: 'Recents: '
+
+                        MDScrollView:
+                            MDList:
+                                id: pcap_list
+
                 IfaceCard:
+                    MDBoxLayout:
+                        padding: 20
+                        orientation: 'vertical'
+                        MDIconButton:
+                            icon: 'wifi'
+                            icon_size: 64
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                        MDDropDownItem:
+                            id: wireless_drop_list
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.wireless_menu.open()
+                        MDScrollView:
+                            MDBoxLayout:
+                                orientation: 'vertical'
+                                size_hint_x: None
+                                width: 350
+                                id: wireless_card_box
+     
                 IfaceCard:
+                    MDBoxLayout:
+                        padding: 20
+                        orientation: 'vertical'
+                        MDIconButton:
+                            icon: 'ethernet'
+                            icon_size: 64
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                        MDDropDownItem:
+                            id: ethernet_drop_list
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.ethernet_menu.open()
+                        MDScrollView:
+                            MDBoxLayout:
+                                orientation: 'vertical'
+                                size_hint_x: None
+                                width: 350
+                                id: ethernet_card_box
+
                 IfaceCard:
+                    MDBoxLayout:
+                        padding: 20
+                        orientation: 'vertical'
+                        MDIconButton:
+                            icon: 'video-input-component'
+                            icon_size: 64
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                        MDDropDownItem:
+                            id: others_drop_list
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.others_menu.open()
+                        MDScrollView:
+                            MDBoxLayout:
+                                orientation: 'vertical'
+                                size_hint_x: None
+                                width: 350
+                                id: others_card_box
 
 
 <IfaceCard@MDCard>:
@@ -31,7 +119,19 @@
     style: 'outlined'
     line_color: app.theme_cls.primary_color
     line_width: 1
-    ripple_behavior: True
-    ripple_color: app.theme_cls.primary_light
     radius: [15]
-    # elevation: 2
+
+<SideBar@MDNavigationRail>:
+    md_bg_color: app.theme_cls.bg_light
+    MDNavigationRailItem:
+        text: 'Home'
+        icon: 'home'
+    MDNavigationRailItem:
+        text: 'DashBoard'
+        icon: 'chart-bar'
+    MDNavigationRailItem:
+        text: 'Settings'
+        icon: 'cog-outline'
+    MDNavigationRailItem:
+        text: 'Help'
+        icon: 'help'

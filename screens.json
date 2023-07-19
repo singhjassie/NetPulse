@@ -1,6 +1,15 @@
 {
     "from libs.uix.baseclass.homescreen import HomeScreen":{
-        "screen_name": "Home",
+        "screen_name": "home",
         "factory": "Factory.HomeScreen()"
+    },
+    "from libs.uix.baseclass.capturescreen import CaptureScreen":{
+        "screen_name": "capture",
+        "factory": "Factory.CaptureScreen()"
+    },
+    "from libs.uix.baseclass.settingsscreen import SettingsScreen":{
+        "screen_name": "settings",
+        "factory": "Factory.SettingsScreen()"
     }
+    
 }

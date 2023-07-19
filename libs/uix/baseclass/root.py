@@ -2,24 +2,26 @@ import json
 
 from kivy.clock import Clock
 from kivy.factory import Factory
-from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.screenmanager import MDScreenManager
 from kivy.lang.builder import Builder
 
-Builder.load_file('libs/uix/kv/root.kv')
 
-class Root(MDBoxLayout):
+class Root(MDScreenManager):
     def __init__(self, *args, **kwargs):
         super(Root, self).__init__(*args, **kwargs)
-        self.add_screens()
-        print(self.ids.screen_manager.screens)
-        self.ids.screen_manager.current = 'Home'
-        self.ids.top_bar.title = 'Home'
+        Clock.schedule_once(self.add_screens)
 
-    def add_screens(self):
+    def add_screens(self, interval):
         with open('screens.json', 'r') as screens_file:
             screens = json.load(screens_file)
             for import_screen_module, screen_details in screens.items():
                 exec(import_screen_module)
                 screen_object = eval(screen_details["factory"])
                 screen_object.name = screen_details["screen_name"]
-                self.ids.screen_manager.add_widget(screen_object)
+                self.add_widget(screen_object)
+    
+    def open_settings(self):
+        print('opening settings....')
+        print(self.current_screen)
+        print(self.screen_names)
+        self.current = 'settings'

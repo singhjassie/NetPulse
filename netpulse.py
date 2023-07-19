@@ -7,11 +7,20 @@ from libs.uix.config import fonts
 class NetPulse(MDApp):
     def __init__(self, **kwargs):
         super(NetPulse, self).__init__(**kwargs)
-        Window.minimum_width = 1080
-        Window.minimum_height = 720
-        Window.size = 1440, 810
+        self.set_window_conf()
+        self.set_theme_conf()
+        self.set_app_conf()
+        
+    def set_app_conf(self):    
         self.title = 'NetPulse'
         self.icon = 'assets/images/NetPulse-with-meterial-bg.png'
+        
+    def set_window_conf(self):    
+        Window.minimum_width = 950
+        Window.minimum_height = 720
+        Window.size = 1250, 750
+
+    def set_theme_conf(self):
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.theme_style_switch_animation = True
         self.theme_cls.primary_palette = 'Red'

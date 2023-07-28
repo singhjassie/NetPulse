@@ -14,14 +14,10 @@ class Root(MDScreenManager):
     def add_screens(self, interval):
         with open('screens.json', 'r') as screens_file:
             screens = json.load(screens_file)
+            self.screen_instances = {}
             for import_screen_module, screen_details in screens.items():
                 exec(import_screen_module)
                 screen_object = eval(screen_details["factory"])
                 screen_object.name = screen_details["screen_name"]
+                self.screen_instances[screen_object.name] = screen_object
                 self.add_widget(screen_object)
-    
-    def open_settings(self):
-        print('opening settings....')
-        print(self.current_screen)
-        print(self.screen_names)
-        self.current = 'settings'

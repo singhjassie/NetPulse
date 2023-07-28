@@ -1,3 +1,6 @@
 {
-    
+
+    "libs.uix.components.sidebar": [
+        "SideBar"
+    ]
 }

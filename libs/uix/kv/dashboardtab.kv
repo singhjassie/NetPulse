@@ -1,0 +1,68 @@
+<DashboardTab>:
+    title: 'Dashboard'
+    tab_label_font_style: 'Subtitle1'
+    md_bg_color: app.theme_cls.bg_dark
+    MDBoxLayout:
+        orientation: 'horizontal'
+        padding: 25, 25, 25, 50
+        spacing: 25
+        MDBoxLayout:
+            orientation: 'vertical'
+            spacing: 25
+            MDCard:
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    Title:
+                        text: 'Bandwidth Monitor'
+                    MDBoxLayout:
+                        id: bandwidth_monitor
+
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                MDCard:
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        Title:
+                            text: 'Top Conversations'
+                        MDBoxLayout:
+                            id: conversations
+
+
+                MDCard:
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        Title:
+                            text: 'Protocols'
+                        MDBoxLayout:
+                            id: protocol_chart
+
+
+        MDCard:
+            size_hint_x: .4
+            MDBoxLayout:
+                orientation: 'vertical'
+                Title:
+                    text: 'Alerts'
+                MDBoxLayout:
+                    id: alerts
+
+                    
+
+<Title@MDLabel>:
+    size_hint_y: .05
+    halign: 'center'
+    valign: 'top'
+    theme_text_color: 'Custom'
+    text_color: app.theme_cls.primary_color
+    tab_label_font_style: 'H4'
+
+<MDCard>:
+    md_bg_color: app.theme_cls.bg_light
+    padding: 30
+    style: 'outlined'
+    radius: [25]
+    line_width: 1
+    line_color: app.theme_cls.primary_color
+    md_bg_color: app.theme_cls.bg_light

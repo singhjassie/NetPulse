@@ -1,6 +1,14 @@
 {
-
-    "libs.uix.components.sidebar": [
-        "SideBar"
+    "libs.uix.components.capturetab": [
+        "CaptureTab"
+    ],
+    "libs.uix.components.dashboardtab": [
+        "DashboardTab"
+    ],
+    "libs.uix.components.troubleshoottab": [
+        "TroubleshootTab"
+    ],
+    "libs.uix.components.preferencestab": [
+        "PreferencesTab"
     ]
 }

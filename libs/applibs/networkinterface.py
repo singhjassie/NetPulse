@@ -93,4 +93,10 @@ class NetworkInterface():
                 other_interfaces.append(details)
         return other_interfaces
     
+    def get_iface_mac(self, iface):
+        return self.interfaces[iface]['mac_address']
+    
+    def get_iface_ip(self, iface):
+        return self.interfaces[iface]['ipv4_address']
+    
 # NetworkInterface()

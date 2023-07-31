@@ -8,10 +8,12 @@ from kivymd.uix.filemanager import MDFileManager
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.label import MDLabel
 from kivymd.uix.list import TwoLineListItem
-from kivymd.uix.snackbar import Snackbar
-from kivymd.uix.button import MDIconButton
+import scapy.all as scapy
+
 
 from libs.applibs.networkinterface import NetworkInterface
+from libs.applibs.capture import Capture
+
 
 Builder.load_file('libs/uix/kv/homescreen.kv')
 
@@ -83,7 +85,7 @@ class HomeScreen(MDScreen):
         
     def load_recent_pcap_list(self):
         try:
-            with open(f'{MDApp.get_running_app().user_data_dir}/recent-pcaps.json', 'r') as recent_list_file:
+            with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'r') as recent_list_file:
                 pcap_files = json.load(recent_list_file)
             for pcap in pcap_files:
                     self.ids.pcap_list.add_widget(
@@ -93,7 +95,7 @@ class HomeScreen(MDScreen):
                             on_release=lambda x, path=pcap['path']: self.select_pcap(path))
                         )
         except FileNotFoundError:
-            with open(f'{MDApp.get_running_app().user_data_dir}/recent-pcaps.json', 'w') as recent_list_file:
+            with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'w') as recent_list_file:
                 recent_list_file.write('[]')
 
 
@@ -121,7 +123,7 @@ class HomeScreen(MDScreen):
         if path.startswith(user_home_dir):
             path = path.replace(user_home_dir, '~')
         file_details = {"name": file_name, "path": path}
-        with open(f'{MDApp.get_running_app().user_data_dir}/recent-pcaps.json', 'r') as recent_pcap_files:
+        with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'r') as recent_pcap_files:
             pcap_files = json.load(recent_pcap_files)
         if file_details in pcap_files:
             pcap_files.remove(file_details)
@@ -129,11 +131,11 @@ class HomeScreen(MDScreen):
         if len(pcap_files)>5:
             pcap_files = pcap_files[0:5]
         json_data = json.dumps(pcap_files)
-        with open(f'{MDApp.get_running_app().user_data_dir}/recent-pcaps.json', 'w') as recent_pcap_files:
+        with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'w') as recent_pcap_files:
             recent_pcap_files.write(json_data)
     
     def open_settings(self):
-        MDApp.get_running_app().root.current = 'settingsscreen'
+        self.screen_manager.current = 'settingsscreen'
 
     def open_pcap(self, path):
         self.update_pcap_file(path)
@@ -142,16 +144,20 @@ class HomeScreen(MDScreen):
         else:
             path = os.path.expanduser(path)
             dir_path, filename = os.path.split(path)
-            self.screen_manager.screen_instances['capturescreen'].read_pcap(path, filename)
-            self.screen_manager.current = 'capturescreen'
+            packet_list = scapy.rdpcap(path)
+            self.tab_screen = self.screen_manager.screen_instances['tabsscreen']
+            self.tab_screen.ids.capture_name.text = filename
+            self.tab_screen.ids.packet_count.text = f'Total Packets: {len(packet_list)}'
+            self.tab_screen.capture_tab.load_pcap_capture(packet_list, filename)
+            self.tab_screen.dashboard_tab.load_pcap_dashboard(packet_list)
+            self.screen_manager.current = 'tabsscreen'
 
     def start_capture(self, interface):
-        try:
-            self.screen_manager.screen_instances['capturescreen'].start_capture(interface)
-            self.screen_manager.current = 'capturescreen'
-        except PermissionError:
-            snackbar = Snackbar(
-                text='Please run application as root or administrator to sniff the interface',
-                bg_color = self.app.theme_cls.primary_color
-                )
-            snackbar.open()
+        capture = Capture()
+        self.tab_screen = self.screen_manager.screen_instances['tabsscreen']
+        self.tab_screen.ids.capture_name.text = interface
+        packet_counter = self.tab_screen.ids.packet_count
+        self.tab_screen.capture_tab.start_capture(interface, capture, packet_counter)
+        self.tab_screen.dashboard_tab.load_iface_dashboard(interface, capture)
+        self.screen_manager.current = 'tabsscreen'
+        

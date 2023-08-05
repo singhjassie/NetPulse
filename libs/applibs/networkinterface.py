@@ -3,11 +3,6 @@ import netifaces
 class NetworkInterface():
     def __init__(self):
         self.interfaces = self.get_all_interfaces()
-        # print(self.interfaces)
-        # print(f'wireless interfaces ; {self.get_wireless_ifaces()}')
-        # print(f'ethernet interfaces ; {self.get_ethernet_ifaces()}')
-        # print(f'localhost interfaces ; {self.get_localhost_ifaces()}')
-        # print(f'other interfaces ; {self.get_other_ifaces()}')
 
     def get_all_interfaces(self):
         interfaces = {}
@@ -98,5 +93,3 @@ class NetworkInterface():
     
     def get_iface_ip(self, iface):
         return self.interfaces[iface]['ipv4_address']
-    
-# NetworkInterface()

@@ -1,0 +1,14 @@
+{
+    "store": "False",
+    "storage location": "~/",
+    "baselines":{
+        "default": 50
+    },
+    "colors": {
+        "TCP": "#4CAF50", 
+        "UDP": "#F44336", 
+        "ICMP": "#039BE5", 
+        "ARP": "#673AB7", 
+        "Others": "#000000"
+    }
+}

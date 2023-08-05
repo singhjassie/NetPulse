@@ -153,11 +153,11 @@ class HomeScreen(MDScreen):
             self.screen_manager.current = 'tabsscreen'
 
     def start_capture(self, interface):
-        capture = Capture()
+        self.capture = Capture()
         self.tab_screen = self.screen_manager.screen_instances['tabsscreen']
         self.tab_screen.ids.capture_name.text = interface
         packet_counter = self.tab_screen.ids.packet_count
-        self.tab_screen.capture_tab.start_capture(interface, capture, packet_counter)
-        self.tab_screen.dashboard_tab.load_iface_dashboard(interface, capture)
+        self.tab_screen.capture_tab.start_capture(interface, self.capture, packet_counter)
+        self.tab_screen.dashboard_tab.load_iface_dashboard(interface, self.capture)
         self.screen_manager.current = 'tabsscreen'
         

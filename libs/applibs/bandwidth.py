@@ -15,7 +15,6 @@ def calculate_bandwidth(packets, interval):  # interval is used to reduce sharpe
             else:
                 break
         bps.append(bits)
-
     return time_intervals, bps
 
 def convert_units(bps, unit):

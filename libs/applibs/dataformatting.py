@@ -1,4 +1,5 @@
 import sys
+import json
 from io import StringIO
 
 from kivymd.app import MDApp
@@ -51,12 +52,18 @@ def extract_filter_components(text):
     protocol, field = _filter.split('.')
     return protocol.upper(), field.lower(), value
 
+def get_colors():
+    with open('configurations.json', 'r') as file:
+        configurations = json.load(file)
+    return configurations['colors']
+
 def format_list_data(raw_packet_list):
     app = MDApp.get_running_app()
     screen_manager = app.root
     show_detail_fxn_obj = screen_manager.screen_instances['tabsscreen'].capture_tab.show_detail
     formatted_packet_list = []
-    colors = {'ARP': 'blue', 'UDP': 'orange', 'TCP': 'green', 'Others': 'black', 'Dot11': 'brown', 'Unidentified': 'red'}
+    # colors = {'ARP': 'blue', 'ICMP': 'cyan', 'UDP': 'orange', 'TCP': 'green', 'Others': 'black', 'Dot11': 'brown', 'Unidentified': 'red'}
+    colors = get_colors()
     for packet_number, packet in enumerate(raw_packet_list):
         list_item = {}
         if packet.haslayer('Ether'):
@@ -70,7 +77,15 @@ def format_list_data(raw_packet_list):
                 if packet['ARP'].op == 'who-has':
                     list_item['secondary_text'] = f"Who has {packet['ARP'].pdst}? Tell {packet['ARP'].psrc}"
                 else:
-                    list_item['secondary_text'] = f"{packet['ARP'].psrc} is at {packet['ARP'].pdst}"
+                    list_item['secondary_text'] = f"{packet['ARP'].psrc} is at {packet['ARP'].hwsrc}"
+            elif packet.haslayer('ICMP'):
+                list_item = {
+                    'viewclass': 'ThreeLineListItem',
+                    'text': f"{packet['IP'].src} -> {packet['IP'].dst}",
+                    'secondary_text': f"Type: {packet['ICMP'].type}, TTL:{packet['IP'].ttl}",
+                    'tertiary_text': f"Protocol: ICMP, Length: {len(packet)}",
+                    'text_color': colors['ICMP']
+                }
             elif packet.haslayer('IP'):
                 if packet.haslayer('TCP'):
                     list_item = {
@@ -93,14 +108,14 @@ def format_list_data(raw_packet_list):
                         'viewclass': 'TwoLineListItem',
                         'text': f"{packet['IP'].src} -> {packet['IP'].dst}",
                         'secondary_text': f"Length: {len(packet)}",
-                        'text_color': colors['Others']
+                        'text_color': 'black'
                         }
 
         elif packet.haslayer('Dot11'):
             list_item = {
                 'viewclass': 'TwoLineListItem',
                 'secondary_text': f"Protocol: 802.11, Length: {len(packet)}, Type: {packet['Dot11'].type}, SubType: {packet['Dot11'].subtype}",
-                'text_color': colors['Dot11']
+                'text_color': 'brown'
             }
             if 'addr2' in packet['Dot11'].fields:
                 list_item['text'] = f"{packet['Dot11'].addr2} -> {packet['Dot11'].addr1}"
@@ -110,7 +125,7 @@ def format_list_data(raw_packet_list):
             list_item = {
                 'viewclass': 'OneLineListItem',
                 'text': 'Unknown Layer2 Protocol',
-                'text_color': colors['Unidentified']
+                'text_color': 'red'
             }
         list_item['divider_color'] = app.theme_cls.primary_color
         list_item['theme_text_color'] = 'Custom'

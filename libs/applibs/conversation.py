@@ -13,9 +13,9 @@ def get_du_conversations(packet_list, iface_ip):
         del conversations[iface_ip]
 
     for packet in packet_list:
-        if packet.haslayer('IP') and packet['IP'].src == iface_ip:
+        if packet.haslayer('IP') and packet['IP'].src == iface_ip and conversations.get(packet['IP'].dst):
             conversations[packet['IP'].dst][0] += len(packet)
-        if packet.haslayer('IP') and packet['IP'].dst == iface_ip:
+        if packet.haslayer('IP') and packet['IP'].dst == iface_ip and conversations.get(packet['IP'].src):
             conversations[packet['IP'].src][1] += len(packet)
     return conversations
 
@@ -102,7 +102,6 @@ def get_conversations(packet_list):
 
 def convert_units(conversations, unit):
     for ip, size in conversations.items():
-        print(size)
         if unit=='b':
             size /= 1
         elif unit=='Kb':

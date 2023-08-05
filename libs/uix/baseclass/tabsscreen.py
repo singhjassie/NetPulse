@@ -19,15 +19,13 @@ class TabsScreen(MDScreen):
             for module, _classes in tabs.items():
                 for _class in _classes:
                     Factory.register(_class, module=module)
-                    print(f'{_class} tab registered')
 
     def add_tabs(self):
         self.capture_tab = Factory.CaptureTab()
         self.dashboard_tab = Factory.DashboardTab()
-        self.troubleshoot_tab = Factory.TroubleshootTab()
+        # self.troubleshoot_tab = Factory.TroubleshootTab()
         self.preferences_tab = Factory.PreferencesTab()
         self.ids.tabs.add_widget(self.capture_tab)
         self.ids.tabs.add_widget(self.dashboard_tab)
-        self.ids.tabs.add_widget(self.troubleshoot_tab)
+        # self.ids.tabs.add_widget(self.troubleshoot_tab)
         self.ids.tabs.add_widget(self.preferences_tab)
-

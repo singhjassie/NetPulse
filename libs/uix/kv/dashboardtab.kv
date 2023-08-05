@@ -1,7 +1,7 @@
+#: import utils kivy.utils
 <DashboardTab>:
     title: 'Dashboard'
-    tab_label_font_style: 'Subtitle1'
-    md_bg_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_light
     MDBoxLayout:
         orientation: 'horizontal'
         padding: 25, 25, 25, 50
@@ -9,7 +9,7 @@
         MDBoxLayout:
             orientation: 'vertical'
             spacing: 25
-            MDCard:
+            DashboardCard:
                 MDBoxLayout:
                     orientation: 'vertical'
                     Title:
@@ -21,7 +21,7 @@
             MDBoxLayout:
                 orientation: 'horizontal'
                 spacing: 25
-                MDCard:
+                DashboardCard:
                     MDBoxLayout:
                         orientation: 'vertical'
                         Title:
@@ -30,7 +30,7 @@
                             id: conversations
 
 
-                MDCard:
+                DashboardCard:
                     MDBoxLayout:
                         orientation: 'vertical'
                         Title:
@@ -39,30 +39,59 @@
                             id: protocol_chart
 
 
-        MDCard:
-            size_hint_x: .4
+        DashboardCard:
+            size_hint_x: .6
             MDBoxLayout:
                 orientation: 'vertical'
                 Title:
                     text: 'Alerts'
+                    size_hint_y: None
+                    height: 30
                 MDBoxLayout:
-                    id: alerts
+                    orientation:'vertical'
+                    size_hint_y: .65
+                    padding: 25, 15, 25, 10
+                    id: alert_chart
+                    MDIconButton:
+                        icon: 'check-circle-outline'
+                        pos_hint: {"center_x": .5, "center_y": .5}
+                        icon_size: 175
+                        theme_text_color: 'Custom'
+                        text_color: 'green'
+                MDBoxLayout:
+                    id: alert_count
+                    orientation: 'horizontal'
+                    adaptive_height: True
+                    MDLabel: 
+                        font_size: 18
+                        size_hint_y: None
+                        height: 30
+                        halign: 'center'
+                        text: 'No Alerts Yet'
+                        theme_text_color: 'Custom'
+                        text_color: 'green'
 
-                    
+                RecycleView:
+                    id: rv
+                    key_viewclass: 'viewclass'
+                    RecycleBoxLayout:
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: 'vertical'
+                        default_size_hint: 1, None
 
 <Title@MDLabel>:
-    size_hint_y: .05
+    size_hint_y: .1
     halign: 'center'
     valign: 'top'
+    bold: True
+    font_size: 18
     theme_text_color: 'Custom'
     text_color: app.theme_cls.primary_color
-    tab_label_font_style: 'H4'
 
-<MDCard>:
-    md_bg_color: app.theme_cls.bg_light
-    padding: 30
+<DashboardCard@MDCard>:
+    md_bg_color: '#ffffff'
+    line_color: app.theme_cls.primary_color
+    padding: 10, 15, 10, 50
     style: 'outlined'
     radius: [25]
-    line_width: 1
-    line_color: app.theme_cls.primary_color
-    md_bg_color: app.theme_cls.bg_light

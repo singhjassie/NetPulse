@@ -1,4 +1,5 @@
 from threading import Thread
+from multiprocessing import Process
 from functools import partial
 
 from kivy.clock import Clock
@@ -14,12 +15,9 @@ Builder.load_file('libs/uix/kv/capturetab.kv')
 class CaptureTab(MDTabsBase, MDFloatLayout):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.root = MDApp.get_running_app().root
-        # self.capture = self.root.capture
-        # self.is_pcap = False
-        # self.is_interface_capture = False
         self.raw_packet_list = []
         self.formatted_packet_list = []
+        self.store = False
 
     def load_pcap_capture(self, packet_list, filename):
         # self.is_pcap = True
@@ -29,10 +27,10 @@ class CaptureTab(MDTabsBase, MDFloatLayout):
         self.update_recycle_view(self.formatted_packet_list)
 
     def start_capture(self, interface, capture_obj, packet_counter):
-        print(f'starting capture on {interface}')
+        # print(f'starting capture on {interface}')
         # self.is_interface_capture = True
-        capture_thread = Thread(target=capture_obj.sniffer, args=[interface])
-        capture_thread.start()
+        self.capture_thread = Thread(target=capture_obj.sniffer, args=[interface])
+        self.capture_thread.start()
         Clock.schedule_interval(partial(self.update_packets, capture_obj, packet_counter), 1)
 
     def update_packets(self, capture_obj, packet_counter, interval):

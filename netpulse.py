@@ -10,6 +10,8 @@ class NetPulse(MDApp):
         self.set_window_conf()
         self.set_theme_conf()
         self.set_app_conf()
+        self.root = Root()
+        self.is_running = True
         
     def set_app_conf(self):    
         self.title = 'NetPulse'
@@ -33,8 +35,26 @@ class NetPulse(MDApp):
         else:
             self.theme_cls.theme_style = 'Light'
 
+    def on_stop(self):
+        self.is_running =False
+        try: 
+            capture_obj = self.root.screen_instances['homescreen'].capture
+        except AttributeError:
+            capture_obj = None
+        if capture_obj:
+            capture_obj.save_pcap()
+        try: 
+            capture_thread = self.root.screen_instances['tabsscreen'].capture_thread
+        except AttributeError:
+            capture_thread = None
+        if capture_thread:
+            capture_thread.join()
+        # current_process = mp.current_process()
+        # current_process.terminate()
+        return super().on_stop()
+    
     def build(self):
-        return Root()
+        return self.root
     
 
 

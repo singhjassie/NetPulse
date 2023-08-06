@@ -1,5 +1,5 @@
 <HomeScreen>
-
+    name: 'homescreen'
     MDBoxLayout:
         orientation: "vertical"
 
@@ -22,7 +22,7 @@
 
             MDIconButton:
                 icon: 'cog-outline'
-                on_release: app.root.open_settings()
+                on_release: root.open_settings()
 
         MDScrollView:
             StackLayout:
@@ -35,6 +35,7 @@
                     MDBoxLayout:
                         padding: 20
                         orientation: 'vertical'
+                        spacing: 10
                         MDIconButton:
                             icon: 'file-document-outline'
                             icon_size: 64
@@ -44,18 +45,27 @@
                             text: 'Upload Pcap File'
                             pos_hint: {'center_x': .5, 'center_y': .5}
                             on_release: root.open_file_manager()
-
+                        MDLabel:
+                            id: selected_pcap_file
+                            text: '-- Not Selected --'
+                            font_style: 'Subtitle1'
+                            halign: 'center'
                         MDLabel:
                             text: 'Recents: '
-
+                            font_style: 'Subtitle1'
                         MDScrollView:
                             MDList:
                                 id: pcap_list
+                        MDFillRoundFlatButton: 
+                            text: 'Open'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.open_pcap(selected_pcap_file.text)
 
                 IfaceCard:
                     MDBoxLayout:
                         padding: 20
                         orientation: 'vertical'
+                        spacing: 10
                         MDIconButton:
                             icon: 'wifi'
                             icon_size: 64
@@ -70,11 +80,16 @@
                                 size_hint_x: None
                                 width: 350
                                 id: wireless_card_box
+                        MDFillRoundFlatButton: 
+                            text: 'Start'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.start_capture(wireless_drop_list.current_item)
      
                 IfaceCard:
                     MDBoxLayout:
                         padding: 20
                         orientation: 'vertical'
+                        spacing: 10
                         MDIconButton:
                             icon: 'ethernet'
                             icon_size: 64
@@ -89,11 +104,16 @@
                                 size_hint_x: None
                                 width: 350
                                 id: ethernet_card_box
+                        MDFillRoundFlatButton: 
+                            text: 'Start'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.start_capture(ethernet_drop_list.current_item)
 
                 IfaceCard:
                     MDBoxLayout:
                         padding: 20
                         orientation: 'vertical'
+                        spacing: 10
                         MDIconButton:
                             icon: 'video-input-component'
                             icon_size: 64
@@ -108,11 +128,15 @@
                                 size_hint_x: None
                                 width: 350
                                 id: others_card_box
+                        MDFillRoundFlatButton: 
+                            text: 'Start'
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            on_release: root.start_capture(others_drop_list.current_item)
 
 
 <IfaceCard@MDCard>:
     size_hint: None, None
-    size: 250, 350
+    size: 250, 400
     focus_behavior: True
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_light
@@ -121,17 +145,4 @@
     line_width: 1
     radius: [15]
 
-<SideBar@MDNavigationRail>:
-    md_bg_color: app.theme_cls.bg_light
-    MDNavigationRailItem:
-        text: 'Home'
-        icon: 'home'
-    MDNavigationRailItem:
-        text: 'DashBoard'
-        icon: 'chart-bar'
-    MDNavigationRailItem:
-        text: 'Settings'
-        icon: 'cog-outline'
-    MDNavigationRailItem:
-        text: 'Help'
-        icon: 'help'
+

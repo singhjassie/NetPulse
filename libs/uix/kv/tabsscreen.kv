@@ -1,0 +1,28 @@
+<TabsScreen>:
+    name: 'tabsscreen'
+    MDTabs:
+        id: tabs
+        # tab_hint_x: True
+        # allow_stretch: True
+        # elevation: 1
+        indicator_color: '#ea9d9d'
+        tab_indicator_type: 'fill'
+        font_name: 'assets/fonts/Exo2-Bold.ttf'
+        # text_color_active: 'white'
+        # tab_padding: 10, 5, 10, 5
+    MDBoxLayout:
+        id: status_bar
+        md_bg_color: app.theme_cls.primary_color
+        orientation: 'horizontal'
+        padding: 10, 0, 10, 0
+        size_hint_y: None
+        height: 30
+        MDLabel:
+            id: capture_name
+        Widget:
+        MDLabel:
+            id: packet_count
+            text: 'Total Packets: 0'
+            halign: 'right'   
+
+

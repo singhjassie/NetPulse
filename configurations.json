@@ -1,0 +1,19 @@
+{
+    "store": "False",
+    "storage location": "~/",
+    "bandwidth baselines":{
+        "Default": 50
+    },
+    "protocol baselines":{
+        "ARP Requests": 10,
+        "ICMP Echo Requests": 10,
+        "TCP SYN Requests": 10
+    },
+    "colors": {
+        "TCP": "#4CAF50", 
+        "UDP": "#F44336", 
+        "ICMP": "#039BE5", 
+        "ARP": "#673AB7", 
+        "Others": "#000000"
+    }
+}

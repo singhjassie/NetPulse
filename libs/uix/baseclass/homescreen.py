@@ -1,21 +1,28 @@
 import os
 import json
 
-from kivymd.uix.screen import MDScreen
+from kivymd.app import MDApp
 from kivy.lang.builder import Builder
+from kivymd.uix.screen import MDScreen
 from kivymd.uix.filemanager import MDFileManager
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.label import MDLabel
 from kivymd.uix.list import TwoLineListItem
-from kivymd.app import MDApp
+from kivymd.uix.snackbar import Snackbar
+import scapy.all as scapy
+
 
 from libs.applibs.networkinterface import NetworkInterface
+from libs.applibs.capture import Capture
+
 
 Builder.load_file('libs/uix/kv/homescreen.kv')
 
 class HomeScreen(MDScreen):
     def __init__(self, *args, **kwargs):
         super(HomeScreen, self).__init__(*args, **kwargs)
+        self.app = MDApp.get_running_app()
+        self.screen_manager = self.app.root
         self.load_recent_pcap_list()
         self.set_interfaces()
 
@@ -41,6 +48,7 @@ class HomeScreen(MDScreen):
         else:
             drop_list_id.text = interfaces[0]['name']
             self.add_details(box_id, interfaces[0])
+            drop_list_id.current_item = interfaces[0]['name']
         menu_items = []
         for iface in interfaces:
             menu_items.append({'viewclass': 'OneLineListItem',
@@ -77,15 +85,26 @@ class HomeScreen(MDScreen):
         box_id.ids[f'{interface["type"]}_ipv6_mask'] = ipv6_netmask_label
         
     def load_recent_pcap_list(self):
-        with open(f'{MDApp.get_running_app().user_data_dir}/recent-pcaps.json', 'r') as recent_list_file:
-            pcap_files = json.load(recent_list_file)
-        for pcap in pcap_files:
-                self.ids.pcap_list.add_widget(TwoLineListItem(text=pcap['name'], secondary_text=pcap['path']))
+        try:
+            with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'r') as recent_list_file:
+                pcap_files = json.load(recent_list_file)
+            for pcap in pcap_files:
+                    self.ids.pcap_list.add_widget(
+                        TwoLineListItem(
+                            text=pcap['name'],
+                            secondary_text=pcap['path'],
+                            on_release=lambda x, path=pcap['path']: self.select_pcap(path))
+                        )
+        except FileNotFoundError:
+            with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'w') as recent_list_file:
+                recent_list_file.write('[]')
+
 
     def open_file_manager(self):
         self.file_manager = MDFileManager(
             exit_manager = self.exit_manager,
-            select_path = self.select_path
+            select_path = self.select_path,
+            ext = ['.pcap', '.cap', '.dmp', '.pcapng']
         )
         self.file_manager.show(os.path.expanduser('~'))
 
@@ -93,24 +112,56 @@ class HomeScreen(MDScreen):
         self.file_manager.close()
     
     def select_path(self, path):
-        self.update_pcap_file(path)
         self.file_manager.close()
+        self.select_pcap(path)
+    
+    def select_pcap(self, path):
+        self.ids.selected_pcap_file.text=path
 
     def update_pcap_file(self, path):
         file_name = os.path.split(path)[1]
         user_home_dir = os.path.expanduser('~')
-        print(user_home_dir)
-        print(path)
         if path.startswith(user_home_dir):
             path = path.replace(user_home_dir, '~')
-            print(path)
         file_details = {"name": file_name, "path": path}
-        with open(f'{MDApp.get_running_app().user_data_dir}/recent-pcaps.json', 'r') as recent_pcap_files:
+        with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'r') as recent_pcap_files:
             pcap_files = json.load(recent_pcap_files)
+        if file_details in pcap_files:
+            pcap_files.remove(file_details)
         pcap_files.insert(0, file_details)
         if len(pcap_files)>5:
             pcap_files = pcap_files[0:5]
         json_data = json.dumps(pcap_files)
-        with open(f'{MDApp.get_running_app().user_data_dir}/recent-pcaps.json', 'w') as recent_pcap_files:
+        with open(f'{self.app.user_data_dir}/recent-pcaps.json', 'w') as recent_pcap_files:
             recent_pcap_files.write(json_data)
     
+    def open_settings(self):
+        self.screen_manager.current = 'settingsscreen'
+
+    def open_pcap(self, path):
+        self.update_pcap_file(path)
+        if path == '-- Not Selected --':
+            pass
+        else:
+            path = os.path.expanduser(path)
+            dir_path, filename = os.path.split(path)
+            try:
+                packet_list = scapy.rdpcap(path)
+                self.tab_screen = self.screen_manager.screen_instances['tabsscreen']
+                self.tab_screen.ids.capture_name.text = filename
+                self.tab_screen.ids.packet_count.text = f'Total Packets: {len(packet_list)}'
+                self.tab_screen.capture_tab.load_pcap_capture(packet_list, filename)
+                self.tab_screen.dashboard_tab.load_pcap_dashboard(packet_list)
+                self.screen_manager.current = 'tabsscreen'
+            except FileNotFoundError:
+                Snackbar(text = f'File {path} is removed!').open()
+
+    def start_capture(self, interface):
+        self.capture = Capture()
+        self.tab_screen = self.screen_manager.screen_instances['tabsscreen']
+        self.tab_screen.ids.capture_name.text = interface
+        packet_counter = self.tab_screen.ids.packet_count
+        self.tab_screen.capture_tab.start_capture(interface, self.capture, packet_counter)
+        self.tab_screen.dashboard_tab.load_iface_dashboard(interface, self.capture)
+        self.screen_manager.current = 'tabsscreen'
+        

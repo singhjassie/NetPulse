@@ -1,0 +1,49 @@
+<CaptureTab>:
+    title: 'Capture'
+    MDBoxLayout:
+        orientation: 'horizontal'
+        Splitter:
+            sizable_from: 'right'
+            strip_size: 2
+            border: .1, .1, .1, .1
+            orientation: 'horizontal'
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: 10
+                MDTextField:
+                    id: filter_box
+                    hint_text: 'Apply Filter'
+                    font_style: 'Subtitle1'
+                    mode: 'rectangle'
+                    on_text_validate: root.apply_filter(self.text) 
+
+                RecycleView:
+                    id: rv
+                    key_viewclass: 'viewclass'
+                    RecycleBoxLayout:
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: 'vertical'
+                        default_size_hint: 1, None
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            Splitter:
+                sizable_from: 'bottom'
+                strip_size: 2
+                border: .1, .1, .1, .1
+                MDScrollView:
+                    MDBoxLayout:
+                        id: detail_box
+                        orientation: 'vertical'
+                        padding: 15
+                        size_hint_y: None
+                        height: 30 * len(self.children)
+
+            MDScrollView:
+                MDBoxLayout:
+                    id: hex_box
+                    orientation: 'vertical'
+                    padding: 15
+                    size_hint_y: None
+                    height: 30 * len(self.children)

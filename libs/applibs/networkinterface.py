@@ -3,11 +3,6 @@ import netifaces
 class NetworkInterface():
     def __init__(self):
         self.interfaces = self.get_all_interfaces()
-        # print(self.interfaces)
-        # print(f'wireless interfaces ; {self.get_wireless_ifaces()}')
-        # print(f'ethernet interfaces ; {self.get_ethernet_ifaces()}')
-        # print(f'localhost interfaces ; {self.get_localhost_ifaces()}')
-        # print(f'other interfaces ; {self.get_other_ifaces()}')
 
     def get_all_interfaces(self):
         interfaces = {}
@@ -19,19 +14,19 @@ class NetworkInterface():
             try:
                 interface_info['ipv4_address'] = iface_detail[2][0]['addr']
             except KeyError:
-                interface_info['ipv4_address'] = 'None'
+                interface_info['ipv4_address'] = '-- Not Available --'
             try:
                 interface_info['ipv4_netmask'] = iface_detail[2][0]['netmask']
             except KeyError:
-                interface_info['ipv4_netmask'] = 'None'
+                interface_info['ipv4_netmask'] = '-- Not Available --'
             try:
                 interface_info['ipv6_address'] = iface_detail[10][0]['addr']
             except KeyError:
-                interface_info['ipv6_address'] = 'None'
+                interface_info['ipv6_address'] = '-- Not Available --'
             try:
                 interface_info['ipv6_netmask'] = iface_detail[10][0]['netmask']
             except KeyError:
-                interface_info['ipv6_netmask'] = 'None'
+                interface_info['ipv6_netmask'] = '-- Not Available --'
             if self.is_wireless(iface):
                 interface_info['type'] = 'wireless'
             elif self.is_localhost(interface_info['ipv4_address']):
@@ -93,4 +88,8 @@ class NetworkInterface():
                 other_interfaces.append(details)
         return other_interfaces
     
-# NetworkInterface()
+    def get_iface_mac(self, iface):
+        return self.interfaces[iface]['mac_address']
+    
+    def get_iface_ip(self, iface):
+        return self.interfaces[iface]['ipv4_address']

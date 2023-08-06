@@ -1,0 +1,200 @@
+<PreferencesTab>:
+    title: 'Preferences'
+    id: preferences_tab
+    md_bg_color: app.theme_cls.bg_light
+    MDScrollView:
+        MDBoxLayout: 
+            orientation: 'vertical'
+            adaptive_height: True
+            padding: 35, 35, 35, 150
+            spacing:35
+            SettingsLabel:
+                text: 'Capture Settings'
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: 125
+                padding: 25, 15, 50, 15
+                spacing: 25
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    MDLabel:
+                        text: 'Automatic Capture File Saving'
+                    MDSwitch:
+                        id: auto_capture_switch
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    MDTextField:
+                        id: file_path
+                        hint_text: 'Choose File Location'
+                    MDIconButton:
+                        icon: 'plus'
+                        on_release: root.open_file_manager()     
+
+            SettingsLabel:
+                text: 'Alert Baseline Settings'
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: (2 + len(bandwidth_baseline_rules.children)) * 60
+                padding: 25, 15, 50, 15
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: 60
+                    MDLabel:
+                        text: 'Add Bandwidth Baseline Rules'
+                        bold: True
+                    MDIconButton:
+                        icon: 'plus'
+                        on_release: root.open_dialog()
+                MDBoxLayout: 
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: 45
+                    MDLabel:
+                        text: 'IP Address'
+                        bold: True
+                    MDLabel:
+                        text: 'Baseline Bandwidth (in MB)'
+                        halign: 'center'
+                        bold: True
+                MDBoxLayout:
+                    id: bandwidth_baseline_rules
+                    orientation: 'vertical'                    
+                    size_hint_y: None
+                    height: len(self.children) * 60
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: 300
+                padding: 25, 15, 50, 15
+                MDLabel:
+                    text: 'Add Protocols Traffic Baseline Rules'
+                    bold: True
+                MDBoxLayout: 
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: 45
+                    MDLabel:
+                        text: 'Protocol'
+                        bold: True
+                    MDLabel:
+                        text: 'Baseline'
+                        halign: 'center'
+                        bold: True
+                MDBoxLayout:
+                    id: protocol_baseline_rules
+                    orientation: 'vertical'                    
+                    size_hint_y: None
+                    height: len(self.children) * 60
+                    MDBoxLayout:
+                        MDLabel:
+                            text: 'ARP Request'
+                        MDTextField:
+                            id: arp_requests
+                            hint_text: 'Number of ARP Requests'
+                    MDBoxLayout:
+                        MDLabel:
+                            text: 'ICMP Echo'
+                        MDTextField:
+                            id: icmp_requests
+                            hint_text: 'Number of ICMP Echo Requests'
+                    MDBoxLayout:
+                        MDLabel:
+                            text: 'TCP SYN'
+                        MDTextField:
+                            id: tcp_syn
+                            hint_text: 'Number of SYN Packets'
+
+            SettingsLabel:
+                text: 'Protocol Coloring Rules'
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: len(self.children) * 60
+                padding: 25, 15, 50, 15
+                spacing: 25
+                ColoringRule:
+                    id: tcp_color
+                    text: 'TCP'
+                ColoringRule:
+                    id: udp_color
+                    text: 'UDP'
+                ColoringRule:
+                    id: icmp_color
+                    text: 'ICMP'
+                ColoringRule:
+                    id: arp_color
+                    text: 'ARP'
+
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                adaptive_height: True
+                spacing: 25
+                MDFillRoundFlatButton:
+                    text: 'Load Default Settings'
+                    on_release: root.load_defaults()
+                MDFillRoundFlatButton:
+                    text: 'Apply Changes'
+                    on_release: root.apply_changes()
+            
+<SettingsLabel@MDLabel>:
+    bold: True
+    font_style: 'Subtitle1'
+
+<SettingsBox@MDCard>:
+    md_bg_color: app.theme_cls.bg_light
+    line_color: app.theme_cls.primary_color
+    padding: 10, 15, 10, 50
+    style: 'outlined'
+    radius: [25]
+
+
+<ColoringRule@MDBoxLayout>:
+    orientation: 'horizontal'
+    text: 'Protocol'
+    text_color: 'black'
+    MDLabel:
+        text: self.parent.text
+        theme_text_color: 'Custom'
+        text_color: self.parent.text_color
+    # MDIcon:
+    MDIconButton:
+        icon: 'format-color-highlight'
+        theme_text_color: 'Custom'
+        text_color: self.parent.text_color
+        # icon_color: self.parent.text_color
+        on_release: app.root.screen_instances['tabsscreen'].preferences_tab.open_color_picker(self.parent.text)
+
+<AddRuleDialog>:
+    orientation: "vertical"
+    padding: "30dp"
+    spacing: "10dp"
+    size_hint_y: None
+    height: "250dp"
+    MDTextField:
+        id: add_ip
+        hint_text: 'IP Address'
+    MDTextField:
+        id: add_bandwidth
+        hint_text: 'Upload (in MB)'
+    MDFillRoundFlatButton:
+        text: 'Add Rule'
+        on_release: self.parent.add_fxn_obj(add_ip.text, add_bandwidth.text)
+
+
+# <BandwidthRule>:
+#     orientation: 'horizontal'
+#     spacing: 50
+#     texts: ['IP', 'Upload', 'Download']
+#     MDTextField:
+#         hint_text: 'IP Address'
+#         text: self.parent.texts[0]
+#     MDTextField:
+#         hint_text: 'Upload'
+#         text: self.parent.texts[1]
+#     MDTextField:
+#         hint_text: 'Download'
+#         text: self.parent.texts[2]

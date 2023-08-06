@@ -8,6 +8,7 @@ from kivymd.uix.filemanager import MDFileManager
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.label import MDLabel
 from kivymd.uix.list import TwoLineListItem
+from kivymd.uix.snackbar import Snackbar
 import scapy.all as scapy
 
 
@@ -144,13 +145,16 @@ class HomeScreen(MDScreen):
         else:
             path = os.path.expanduser(path)
             dir_path, filename = os.path.split(path)
-            packet_list = scapy.rdpcap(path)
-            self.tab_screen = self.screen_manager.screen_instances['tabsscreen']
-            self.tab_screen.ids.capture_name.text = filename
-            self.tab_screen.ids.packet_count.text = f'Total Packets: {len(packet_list)}'
-            self.tab_screen.capture_tab.load_pcap_capture(packet_list, filename)
-            self.tab_screen.dashboard_tab.load_pcap_dashboard(packet_list)
-            self.screen_manager.current = 'tabsscreen'
+            try:
+                packet_list = scapy.rdpcap(path)
+                self.tab_screen = self.screen_manager.screen_instances['tabsscreen']
+                self.tab_screen.ids.capture_name.text = filename
+                self.tab_screen.ids.packet_count.text = f'Total Packets: {len(packet_list)}'
+                self.tab_screen.capture_tab.load_pcap_capture(packet_list, filename)
+                self.tab_screen.dashboard_tab.load_pcap_dashboard(packet_list)
+                self.screen_manager.current = 'tabsscreen'
+            except FileNotFoundError:
+                Snackbar(text = f'File {path} is removed!').open()
 
     def start_capture(self, interface):
         self.capture = Capture()

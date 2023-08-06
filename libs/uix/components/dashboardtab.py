@@ -109,9 +109,11 @@ class DashboardTab(MDTabsBase, MDFloatLayout):
                 'theme_text_color': 'Error'
             })
         for warning in self.warnings:
+            print(warning)
             alerts.append({
-                'viewclass': 'OneLineListItem',
-                'text': warning,
+                'viewclass': 'TwoLineListItem',
+                'text': warning[0],
+                'secondary_text': warning[1],
                 'theme_text_color': 'Custom',
                 'text_color': 'orange'
             })

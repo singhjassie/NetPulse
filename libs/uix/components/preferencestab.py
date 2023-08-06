@@ -1,6 +1,5 @@
 import os
 import json
-from typing import Union
 
 
 from kivymd.app import MDApp
@@ -9,7 +8,7 @@ from kivymd.uix.tab import MDTabsBase
 from kivy.lang.builder import Builder
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.filemanager import MDFileManager
-from kivymd.uix.textfield import MDTextField
+from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.pickers import MDColorPicker
@@ -35,9 +34,12 @@ class PreferencesTab(MDTabsBase, MDFloatLayout):
     def update_tab(self):
         self.ids.auto_capture_switch.active = self.configurations['store']
         self.ids.file_path.text = self.configurations['storage location']
-        self.ids.baseline_rules.clear_widgets(self.ids.baseline_rules.children)
-        for ip, baseline in self.configurations['baselines'].items():
+        self.ids.bandwidth_baseline_rules.clear_widgets(self.ids.bandwidth_baseline_rules.children)
+        for ip, baseline in self.configurations['bandwidth baselines'].items():
             self.add_bandwidth_rule(ip, baseline)
+        self.ids.arp_requests.text = str(self.configurations['protocol baselines']['ARP Requests'])
+        self.ids.icmp_requests.text = str(self.configurations['protocol baselines']['ICMP Echo Requests'])
+        self.ids.tcp_syn.text = str(self.configurations['protocol baselines']['TCP SYN Requests'])
         self.ids.tcp_color.text_color = self.configurations['colors']['TCP']
         self.ids.udp_color.text_color = self.configurations['colors']['UDP']
         self.ids.icmp_color.text_color = self.configurations['colors']['ICMP']
@@ -69,17 +71,12 @@ class PreferencesTab(MDTabsBase, MDFloatLayout):
         pass
 
     def get_selected_color(self, protocol, selected_color):
-        # print(f"Selected color is {selected_color}")
-        # print(f'protocol: {protocol}')
         self.color_picker.dismiss()
         hex_color = self.rgba_to_hex(selected_color)
         self.configurations['colors'][protocol] = hex_color
         self.update_tab()
-        # print(f"Selected color is {hex_color}")
 
     def rgba_to_hex(obj, rgba):
-        # print(rgba)
-        # print(obj)
         r, g, b, a = rgba
         return "#{:02X}{:02X}{:02X}".format(int(r * 255), int(g * 255), int(b * 255))
 
@@ -102,7 +99,12 @@ class PreferencesTab(MDTabsBase, MDFloatLayout):
         configurations = {
             'store': self.ids.auto_capture_switch.active,
             'storage location': self.ids.file_path.text,
-            'baselines': self.configurations['baselines'],
+            'bandwidth baselines': self.configurations['bandwidth baselines'],
+            'protocol baselines': {
+                            "ARP Requests": self.ids.arp_requests.text,
+                            "ICMP Echo Requests": self.ids.icmp_requests.text,
+                            "TCP SYN Requests": self.ids.tcp_syn.text
+                            },
             'colors': self.configurations['colors']
         }
         configurations_str = json.dumps(configurations)
@@ -111,13 +113,13 @@ class PreferencesTab(MDTabsBase, MDFloatLayout):
 
 
     def add_bandwidth_rule(self, ip, bandwidth):
-        self.configurations['baselines'][ip] = bandwidth
+        self.configurations['bandwidth baselines'][ip] = bandwidth
         bandwidth_rule = BandwidthRule(ip=ip, bandwidth=str(bandwidth), remove_fxn_obj=self.remove_bandwidth_rule)
         self.baseline_widgets.append(bandwidth_rule)
-        self.ids.baseline_rules.add_widget(bandwidth_rule)
+        self.ids.bandwidth_baseline_rules.add_widget(bandwidth_rule)
 
     def remove_bandwidth_rule(self, rule_widget):
-        self.ids.baseline_rules.remove_widget(rule_widget)
+        self.ids.bandwidth_baseline_rules.remove_widget(rule_widget)
     
     def add_bandwidth_callback(self, ip, bandwidth):
         self.add_bandwidth_rule(ip, bandwidth)
@@ -135,8 +137,13 @@ class PreferencesTab(MDTabsBase, MDFloatLayout):
             file.write({
                 "store": "False",
                 "storage location": "~/",
-                "baselines":{
-                    "default": 50
+                "bandwidth baselines":{
+                    "Default": 50
+                },
+                "protocol baselines":{
+                    "ARP Requests": 10,
+                    "ICMP Echo Requests": 10,
+                    "TCP SYN Requests": 10
                 },
                 "colors": {
                     "TCP": "#4CAF50", 
@@ -153,8 +160,8 @@ class BandwidthRule(MDBoxLayout):
         self.ip = ip
         self.bandwidth = bandwidth
         rule_widget = self
-        self.add_widget(MDTextField(hint_text='IP Address', text=self.ip))
-        self.add_widget(MDTextField(hint_text='Bandwidth (in mB)', text=f'{self.bandwidth} MB'))
+        self.add_widget(MDLabel(text=self.ip))
+        self.add_widget(MDLabel(text=f'{self.bandwidth} MB'))
         self.add_widget(MDIconButton(icon='trash-can-outline', on_release=lambda instance: remove_fxn_obj(rule_widget)))
 
 class AddRuleDialog(MDBoxLayout):

@@ -1,8 +1,13 @@
 {
     "store": "False",
     "storage location": "~/",
-    "baselines":{
-        "default": 50
+    "bandwidth baselines":{
+        "Default": 50
+    },
+    "protocol baselines":{
+        "ARP Requests": 10,
+        "ICMP Echo Requests": 10,
+        "TCP SYN Requests": 10
     },
     "colors": {
         "TCP": "#4CAF50", 

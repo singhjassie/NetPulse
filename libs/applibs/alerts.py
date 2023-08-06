@@ -4,12 +4,30 @@ from kivymd.app import MDApp
 
 import libs.applibs.conversation as cv
 
+def get_configuration():
+    with open(f'{MDApp.get_running_app().user_data_dir}/configurations.json', 'r') as file:
+        configurations = json.load(file)
+    return configurations
+
 def get_warnings(packet_list):
     warnings = []
-    bandwidth_alerts = check_for_bandwidth_baselines(packet_list)
+    config = get_configuration()
+    arp_scan_alerts = detect_arp_scan(packet_list, config['protocol baselines']['ARP Requests'])
+    if arp_scan_alerts:
+        for alert in arp_scan_alerts:
+            warnings.append(alert)
+    icmp_scan_alerts = detect_icmp_scan(packet_list, config['protocol baselines']['ICMP Echo Requests'])
+    if icmp_scan_alerts:
+        for alert in icmp_scan_alerts:
+            warnings.append(alert)
+    tcp_scan_alerts = detect_tcp_scan(packet_list, config['protocol baselines']['TCP SYN Requests'])
+    if tcp_scan_alerts:
+        for alert in tcp_scan_alerts:
+            warnings.append(alert)
+    bandwidth_alerts = check_for_bandwidth_baselines(packet_list, config['bandwidth baselines'])
     if bandwidth_alerts:
         for ip, bandwidth in bandwidth_alerts.items():
-            warnings.append(f'{ip} has exceeded its baseline bandwidth usage')
+            warnings.append(('Bandwidth Alert', f'{ip} has exceeded its baseline bandwidth usage'))
     return warnings
 
 def get_critical_alerts(packet_list):
@@ -25,26 +43,70 @@ def get_critical_alerts(packet_list):
     return critical_alerts
 
 # warnings
-def get_baselines():
-    with open(f'{MDApp.get_running_app().user_data_dir}/configurations.json', 'r') as file:
-        configurations = json.load(file)
-    return configurations['baselines']
-
-def check_for_bandwidth_baselines(packet_list):
+def check_for_bandwidth_baselines(packet_list, badwidth_baselines):
     bandwidth_alerts = {}
     conversations = cv.get_conversations(packet_list)
     conversations = cv.convert_units(conversations, 'MB')
-    baselines = get_baselines()
+    baselines = badwidth_baselines
     for ip, bandwidth in conversations.items():
         if baselines.get(ip):
             if bandwidth > int(baselines.get(ip)):
                 bandwidth_alerts[ip] = bandwidth
         else:
-            if bandwidth > int(baselines.get('default')):
+            if bandwidth > int(baselines.get('Default')):
                 bandwidth_alerts[ip] = bandwidth
     return bandwidth_alerts
 
-            
+def detect_arp_scan(packet_list, arp_request_count):
+    arp_requests = {}
+    arp_replies = {}
+    alerts = []
+    for packet in packet_list:
+        if packet.haslayer('ARP') and packet['ARP'].op==1:
+            if arp_requests.get(packet['ARP'].psrc) == None:
+                arp_requests[packet['ARP'].psrc] = 1
+            else:
+                arp_requests[packet['ARP'].psrc] += 1
+        elif packet.haslayer('ARP') and packet['ARP'].op==2:
+            if arp_replies.get(packet['ARP'].psrc) == None:
+                arp_replies[packet['ARP'].psrc] = 1
+            else:
+                arp_replies[packet['ARP'].psrc] += 1
+    for ip, count in arp_requests.items():
+        if count > arp_request_count:
+            alerts.append(('ARP Scan Detected', f'Unusual ARP Requests from {ip}'))
+    for ip, count in arp_replies.items():
+        if count > arp_request_count:
+            alerts.append(('ARP Scan Detected', f'Unusual ARP Replies from {ip}'))
+    return alerts
+
+def detect_icmp_scan(packet_list, icmp_request_count):
+    icmp_echo_requests = {}
+    alerts = []
+    for packet in packet_list:
+        if packet.haslayer('ICMP') and packet['ICMP'].type==8:
+            if icmp_echo_requests.get(packet['IP'].src) == None:
+                icmp_echo_requests[packet['IP'].src] = 0
+            else:
+                icmp_echo_requests[packet['IP'].src] += 1
+    for ip, count in icmp_echo_requests.items():
+        if count > icmp_request_count:
+            alerts.append(('ICMP Scan Detected', f'Unusual ICMP Echo Replies from {ip}'))
+    return alerts
+
+def detect_tcp_scan(packet_list, tcp_syn_count):
+    tcp_syn = {}
+    alerts = []
+    for packet in packet_list:
+        if packet.haslayer('TCP') and packet['TCP'].flags=='S':
+            if tcp_syn.get(packet['IP'].src) == None:
+                tcp_syn[packet['IP'].src] = 0
+            else:
+                tcp_syn[packet['IP'].src] += 1
+    for ip, count in tcp_syn.items():
+        if count > tcp_syn_count:
+            alerts.append(('TCP SYN Scan Detected', f'Unusual TCP Syn packets from {ip}'))
+    return alerts
 
 # critical alerts
 def detect_duplicate_mac(packet_list):

@@ -10,7 +10,7 @@ from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
 import libs.applibs.plot as plt
 from libs.applibs.networkinterface import NetworkInterface
-import libs.applibs.alerts as alerts
+from libs.applibs.alerts import Alert
 
 Builder.load_file('libs/uix/kv/dashboardtab.kv')
 
@@ -18,6 +18,7 @@ class DashboardTab(MDTabsBase, MDFloatLayout):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.packet_list = []
+        self.alert_obj = Alert()
         self.warnings = []
         self.critical_alerts = []
         self.interface = None
@@ -77,8 +78,8 @@ class DashboardTab(MDTabsBase, MDFloatLayout):
         self.ids.conversations.add_widget(canvas)
 
     def detect_alerts(self, t):
-        warnings = alerts.get_warnings(self.packet_list)
-        critical_alerts = alerts.get_critical_alerts(self.packet_list)
+        warnings = self.alert_obj.get_warnings(self.packet_list)
+        critical_alerts = self.alert_obj.get_critical_alerts(self.packet_list)
         if warnings:
             self.warnings = warnings
             self.update_alerts()

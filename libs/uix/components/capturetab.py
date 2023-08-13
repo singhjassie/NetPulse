@@ -57,3 +57,4 @@ class CaptureTab(MDTabsBase, MDFloatLayout):
         detail_lines = df.get_packet_detail(packet)
         for line in detail_lines:
             self.ids.detail_box.add_widget(MDLabel(text=line, valign='top'))
+        

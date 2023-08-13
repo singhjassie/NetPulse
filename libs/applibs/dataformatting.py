@@ -110,6 +110,23 @@ def format_list_data(raw_packet_list):
                         'secondary_text': f"Length: {len(packet)}",
                         'text_color': 'black'
                         }
+            elif packet.haslayer('IPv6'):
+                list_item = {
+                    'viewclass': 'TwoLineListItem',
+                    'text': f"{packet['IPv6'].src} -> {packet['IPv6'].dst}",
+                    'secondary_text': f"Protocol: IPv6, Length: {len(packet)}",
+                    'text_color': 'orange'
+                    }
+            else:
+                list_item = {
+                    'viewclass': 'TwoLineListItem',
+                    'text': f"{packet['Ether'].src} -> {packet['Ether'].dst}",
+                    'secondary_text': f"Protocol: Unknown, Length: {len(packet)}",
+                    'text_color': 'red'
+                    }
+
+            
+
 
         elif packet.haslayer('Dot11'):
             list_item = {

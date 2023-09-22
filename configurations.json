@@ -1,6 +1,6 @@
 {
     "store": "False",
-    "storage location": "~/",
+    "storage location": "~/NetPulse/Captures/",
     "bandwidth baselines":{
         "Default": 50
     },

@@ -4,12 +4,9 @@ from kivy.clock import Clock
 from kivy.factory import Factory
 from kivymd.uix.screenmanager import MDScreenManager
 
-from libs.applibs.capture import Capture
-
 class Root(MDScreenManager):
     def __init__(self, *args, **kwargs):
         super(Root, self).__init__(*args, **kwargs)
-        self.capture = Capture()
         Clock.schedule_once(self.add_screens)
 
     def add_screens(self, t):

@@ -15,6 +15,7 @@ class Capture():
         with open(f'{self.app.user_data_dir}/configurations.json', 'r') as file:
             configurations = json.load(file)
         self.parent_dir = configurations["storage location"]
+        self.parent_dir = os.path.expanduser(self.parent_dir)
         self.file_name = f'{datetime.now().strftime("%H-%M-%S-%d-%m-%Y")}.pcap'
         self.save_path = os.path.join(self.parent_dir, self.file_name)
         self.save_path = os.path.expanduser(self.save_path)
@@ -26,6 +27,8 @@ class Capture():
                 scapy.wrpcap(self.save_path, self.packet_list)
             except FileNotFoundError:
                 print(self.save_path)
+                if not os.path.exists(self.parent_dir):
+                    os.makedirs(self.parent_dir, exist_ok=True)
                 with open(self.save_path, 'w') as pcap:
                     pass
                 scapy.wrpcap(self.save_path, self.packet_list)

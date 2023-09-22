@@ -136,7 +136,7 @@ class PreferencesTab(MDTabsBase, MDFloatLayout):
         with open('configurations.json', 'w') as file:
             file.write({
                 "store": "False",
-                "storage location": "~/",
+                "storage location": "~/NetPulse/Captures/",
                 "bandwidth baselines":{
                     "Default": 50
                 },

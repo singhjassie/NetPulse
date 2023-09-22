@@ -22,9 +22,9 @@ class TabsScreen(MDScreen):
 
     def add_tabs(self):
         self.capture_tab = Factory.CaptureTab()
-        self.dashboard_tab = Factory.DashboardTab()
         # self.troubleshoot_tab = Factory.TroubleshootTab()
         self.preferences_tab = Factory.PreferencesTab()
+        self.dashboard_tab = Factory.DashboardTab()
         self.ids.tabs.add_widget(self.capture_tab)
         self.ids.tabs.add_widget(self.dashboard_tab)
         # self.ids.tabs.add_widget(self.troubleshoot_tab)

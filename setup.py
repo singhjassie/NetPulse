@@ -37,7 +37,7 @@ setup(
     keywords="NetPulse netpulse network traffic analysis wireshark monitor analyze",
     python_requires=">=3.9",
     entry_points={
-        'console_scripts':['']
+        'console_scripts':['main']
     }
     
 )

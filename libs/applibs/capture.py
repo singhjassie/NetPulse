@@ -12,13 +12,39 @@ class Capture():
         self.get_save_path()
 
     def get_save_path(self):
-        with open(f'{self.app.user_data_dir}/configurations.json', 'r') as file:
-            configurations = json.load(file)
+        try:
+            with open(f'{self.app.user_data_dir}/configurations.json', 'r') as file:
+                configurations = json.load(file)
+        except FileNotFoundError:
+                self.create_default_configuration_file()
+                with open(f'{self.app.user_data_dir}/configurations.json', 'r') as file:
+                    configurations = json.load(file)
         self.parent_dir = configurations["storage location"]
         self.file_name = f'{datetime.now().strftime("%H-%M-%S-%d-%m-%Y")}.pcap'
         self.save_path = os.path.join(self.parent_dir, self.file_name)
         self.save_path = os.path.expanduser(self.save_path)
         self.store = configurations['store']
+
+    def create_default_configuration_file(self):
+        print("creating new config file......")
+        with open(f'{self.app.user_data_dir}/configurations.json', 'w') as file:
+            file.write("""{
+                "store": "False",
+                "storage location": "~/",
+                "bandwidth baselines":{
+                    "Default": 50
+                },
+                "protocol baselines":{
+                    "ARP Requests": 10,
+                    "ICMP Echo Requests": 10,
+                    "TCP SYN Requests": 10
+                },
+                "colors": {
+                    "TCP": "#4CAF50", 
+                    "UDP": "#F44336", 
+                    "ICMP": "#039BE5", 
+                    "ARP": "#673AB7"}
+            }""")
 
     def save_pcap(self):
         if self.store:
